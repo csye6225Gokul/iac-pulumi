@@ -2,7 +2,6 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import { vpc } from "../vpc";
 import { publicSubnets, privateSubnets } from "../subnets";
-import { internetGateway } from "../igw";
 
 // Creating a public route table
 export const publicRouteTable = new aws.ec2.RouteTable("publicRouteTable", {
