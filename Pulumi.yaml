@@ -1,0 +1,4 @@
+name: iac-pulumi
+runtime: nodejs
+description: A AWS Typescript pulumi code to create Vpc with Public subnet and private subnet 
+main: bin/index.js

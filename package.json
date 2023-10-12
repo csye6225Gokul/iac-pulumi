@@ -1,0 +1,14 @@
+{
+    "name": "iac-pulumi",
+    "devDependencies": {
+        "@types/ip": "^1.1.1",
+        "@types/node": "^10.0.0",
+        "typescript": "^2.9.2"
+    },
+    "dependencies": {
+        "@pulumi/aws": "^6.5.0",
+        "@pulumi/pulumi": "^3.88.1",
+        "ip": "^1.1.8",
+        "p": "^0.2.0"
+    }
+}
