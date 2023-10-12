@@ -40,15 +40,13 @@ const config = new pulumi.Config();
 const publicSubnetCidrBlocks = config.requireObject<string[]>("publicSubnetCidrBlocks");
 const privateSubnetCidrBlocks = config.requireObject<string[]>("privateSubnetCidrBlocks");
 
-// Properly handling Pulumi Output for availability zones
 const availabilityZones = pulumi.output(aws.getAvailabilityZones({}).then(az => az.names));
 
 availabilityZones.apply(az => console.log(az));
 
-// Determine number of subnets to create based on availability zones
 const subnetCount = availabilityZones.apply(az => az.length <= 2 ? 2 : 3);
 
-// Creating public subnets
+
 export const publicSubnets = pulumi.all([publicSubnetCidrBlocks, subnetCount, availabilityZones])
     .apply(([cidrBlocks, count, az]) => 
         cidrBlocks.slice(0, count).map((cidrBlock, index) => 
@@ -61,7 +59,6 @@ export const publicSubnets = pulumi.all([publicSubnetCidrBlocks, subnetCount, av
         )
     );
 
-// Creating private subnets
 export const privateSubnets = pulumi.all([privateSubnetCidrBlocks, subnetCount, availabilityZones])
     .apply(([cidrBlocks, count, az]) => 
         cidrBlocks.slice(0, count).map((cidrBlock, index) => 

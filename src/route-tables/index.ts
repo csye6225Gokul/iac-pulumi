@@ -37,12 +37,12 @@ import * as aws from "@pulumi/aws";
 import { vpc } from "../vpc";
 import { publicSubnets, privateSubnets } from "../subnets";
 
-// Creating a public route table
+
 export const publicRouteTable = new aws.ec2.RouteTable("publicRouteTable", {
     vpcId: vpc.id
 });
 
-// Associate public subnets with public route table
+
 publicSubnets.apply(subnets => 
     subnets.forEach((subnet, index) => {
         new aws.ec2.RouteTableAssociation(`publicRouteTableAssociation${index}`, {
@@ -52,12 +52,12 @@ publicSubnets.apply(subnets =>
     })
 );
 
-// Creating a private route table
+
 export const privateRouteTable = new aws.ec2.RouteTable("privateRouteTable", {
     vpcId: vpc.id
 });
 
-// Associate private subnets with private route table
+
 privateSubnets.apply(subnets => 
     subnets.forEach((subnet, index) => {
         new aws.ec2.RouteTableAssociation(`privateRouteTableAssociation${index}`, {
