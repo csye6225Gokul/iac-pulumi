@@ -5,6 +5,6 @@ const config = new pulumi.Config();
 const cidrBlock = config.require("cidrBlock");
 
 
-export const vpc = new aws.ec2.Vpc("myVpc", {
+export const vpc = new aws.ec2.Vpc("csye6225-vpc", {
     cidrBlock: cidrBlock
 });
