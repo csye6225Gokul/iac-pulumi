@@ -8,4 +8,5 @@ export const internetGateway = new aws.ec2.InternetGateway("myInternetGateway", 
     tags: {
         Name: "Csye6255-gokul-internetGateway",
     },
+
 });

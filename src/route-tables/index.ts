@@ -43,6 +43,7 @@ export const publicRouteTable = new aws.ec2.RouteTable("publicRouteTable", {
     tags: {
         Name: "Csye6255-gokul-publicroutetable",
     },
+
 });
 
 

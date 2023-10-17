@@ -8,14 +8,12 @@ const config = new pulumi.Config();
 // const privateSubnetCidrBlocks = config.requireObject<string[]>("privateSubnetCidrBlocks");
 const baseCidrBlock = config.require("cidrBlock");
 
+
 const availabilityZones = pulumi.output(aws.getAvailabilityZones({}).then(az => az.names));
 
 availabilityZones.apply(az => console.log(az));
 
 const subnetCount = availabilityZones.apply(az => az.length <= 2 ? 2 : 3);
-
-
-
 
 
 // Function to calculate the new subnet mask
@@ -70,6 +68,7 @@ export const publicSubnets = pulumi.all([subnetCidrBlocks, subnetCount, availabi
                 tags: {
                     Name: "Csye6255-gokul-publicsubnet",
                 },
+
                 mapPublicIpOnLaunch: true
             })
         )
@@ -90,8 +89,6 @@ export const privateSubnets = pulumi.all([subnetCidrBlocks, subnetCount, availab
             })
         )
     );
-
-
 
 
 //  export   const publicSubnets = availabilityZones.apply(azs =>
@@ -116,8 +113,6 @@ export const privateSubnets = pulumi.all([subnetCidrBlocks, subnetCount, availab
 //             return subnet;
 //         })
 //     );
-
-
 // import * as pulumi from "@pulumi/pulumi";
 // import * as aws from "@pulumi/aws";
 // import { vpc } from "../vpc";
