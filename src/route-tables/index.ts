@@ -39,7 +39,10 @@ import { publicSubnets, privateSubnets } from "../subnets";
 
 
 export const publicRouteTable = new aws.ec2.RouteTable("publicRouteTable", {
-    vpcId: vpc.id
+    vpcId: vpc.id,
+    tags: {
+        Name: "Csye6255-gokul-publicroutetable",
+    },
 });
 
 
@@ -54,7 +57,10 @@ publicSubnets.apply(subnets =>
 
 
 export const privateRouteTable = new aws.ec2.RouteTable("privateRouteTable", {
-    vpcId: vpc.id
+    vpcId: vpc.id,
+    tags: {
+        Name: "Csye6255-gokul-privateroutetable",
+    },
 });
 
 
