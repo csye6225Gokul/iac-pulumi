@@ -4,5 +4,9 @@ import { vpc } from "../vpc";
 
 
 export const internetGateway = new aws.ec2.InternetGateway("myInternetGateway", {
-    vpcId: vpc.id
+    vpcId: vpc.id,
+    tags: {
+        Name: "Csye6255-gokul-internetGateway",
+    },
+
 });

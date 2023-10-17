@@ -92,6 +92,20 @@ out
 .nuxt
 dist
 
+# Dependencies
+node_modules/
+
+# IDE - Visual Studio Code
+.vscode/
+
+# System Files
+.DS_Store
+
+# Pulumi
+bin/
+pulumi-debug.yaml
+
+
 # Gatsby files
 .cache/
 # Comment in the public line in if your project uses Gatsby and not Next.js
