@@ -28,5 +28,6 @@ To set region from command line for aws, pulumi config set aws:region <region_na
 
 To run pulumi
 1. Run tsc to compile the typescript code
-2. pulumi up command, to run pulumi. After this command, will be prompted to enter the secrect passphrase for pulumi
-3. To destroy created resources or update, give pulumi destroy/ pulumi up
+2. update your latest amiid in your stack yaml file
+3. pulumi up command, to run pulumi. After this command, will be prompted to enter the secrect passphrase for pulumi
+4. To destroy created resources or update, give pulumi destroy/ pulumi up
