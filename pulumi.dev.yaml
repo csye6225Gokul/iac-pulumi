@@ -1,7 +1,7 @@
 config:
   aws:region: us-east-1
   iac-pulumi:cidrBlock: "10.1.0.0/16"
-  iac-pulumi:amiId: ami-00c413c0d7a9f48f8
+  iac-pulumi:amiId: ami-07a8f455d8f0ea58f
   # iac-pulumi:privateSubnetCidrBlocks:
   #   - "10.0.4.0/24"
   #   - "10.0.5.0/24"

@@ -3,6 +3,9 @@ import * as aws from "@pulumi/aws";
 import { vpc } from "../vpc";
 
 
+const config = new pulumi.Config();
+const cidrBlock = config.require("igwcidrBlock");
+
 // Create a new security group
 export const appSecurityGroup = new aws.ec2.SecurityGroup("application-security-group", {
     description: "Enable access to application",
@@ -16,28 +19,28 @@ export const appSecurityGroup = new aws.ec2.SecurityGroup("application-security-
             protocol: "tcp",
             fromPort: 22,
             toPort: 22,
-            cidrBlocks: ["0.0.0.0/0"]
+            cidrBlocks: [cidrBlock]
         },
         // HTTP access
         {
             protocol: "tcp",
             fromPort: 80,
             toPort: 80,
-            cidrBlocks: ["0.0.0.0/0"]
+            cidrBlocks: [cidrBlock]
         },
         // HTTPS access
         {
             protocol: "tcp",
             fromPort: 443,
             toPort: 443,
-            cidrBlocks: ["0.0.0.0/0"]
+            cidrBlocks: [cidrBlock]
         },
         // Application access (assume it's running on port 5000)
         {
             protocol: "tcp",
             fromPort: 9000,
             toPort: 9000,
-            cidrBlocks: ["0.0.0.0/0"]
+            cidrBlocks: [cidrBlock]
         }
     ]
 });
