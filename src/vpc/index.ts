@@ -6,5 +6,8 @@ const cidrBlock = config.require("cidrBlock");
 
 
 export const vpc = new aws.ec2.Vpc("csye6225-vpc", {
-    cidrBlock: cidrBlock
+    cidrBlock: cidrBlock,
+    tags: {
+        Name: "Csye6255-gokul-VPC",
+    }
 });
