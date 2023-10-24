@@ -4,6 +4,7 @@ import * as aws from "@pulumi/aws";
 import { vpc } from "../vpc";
 import { publicSubnets } from "../subnets"; 
 import { appSecurityGroup } from "../securityGroup";
+import {dbEndpoint} from "../rdsdb"
 
 const config = new pulumi.Config();
 
@@ -33,6 +34,34 @@ const keyPair = new aws.ec2.KeyPair("mykeypair", {
 
 const keyPairName = keyPair.id.apply(id => id);
 
+// const [host, port] = dbEndpoint.split(':');
+
+const dbHost = dbEndpoint.apply(endpoint => endpoint.split(':')[0]);
+const dbPort = dbEndpoint.apply(endpoint => endpoint.split(':')[1]);
+
+const ec2UserData =  `#!/bin/bash
+    cloud-init status --wait
+
+    echo "Starting custom userData script after cloud-init at $(date)" >> /var/log/userdata_execution.log
+
+
+    sudo echo "MYSQL_HOST='${dbHost}'" | sudo tee /home/admin/webapp/.env
+    sudo echo "MYSQL_PORT='${dbPort}'" | sudo tee /home/admin/webapp/.env
+    sudo echo "MYSQL_USER='csye6225'" | sudo tee -a /home/admin/webapp/.env
+    sudo echo "MYSQL_PASSWORD='msdIndu99'" | sudo tee -a /home/admin/webapp/.env
+    sudo echo "MYSQL_DATABASE='csye6225'" | sudo tee -a /home/admin/webapp/.env
+    
+    # Give csye6225 user permissions to read files
+    chmod +r /home/admin/webapp/*
+    
+    # Enable and start the service
+    cd /etc/systemd/system
+    systemctl enable csye6225.service
+    systemctl start csye6225.service
+    echo "Script stop..."
+    `;
+
+
 const ec2Instance = new aws.ec2.Instance("myInstance", {
     ami: amiId,
     instanceType: "t2.micro",
@@ -45,6 +74,7 @@ const ec2Instance = new aws.ec2.Instance("myInstance", {
         deleteOnTermination: true,
     },
     subnetId: publicSubnets[0].id,
+    userData: ec2UserData, 
     tags: {
         Name: "Csye6255-gokul",
     },
