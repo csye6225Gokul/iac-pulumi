@@ -64,6 +64,6 @@ const dbInstance = new aws.rds.Instance("db-instance", {
 
 
 // Export the database endpoint
-export const dbEndpoint = dbInstance.endpoint;
+export const dbEndpoint = dbInstance;
 export const dbHost = dbInstance.endpoint.apply(endpoint => endpoint.split(':')[0]);
 export const dbPort = dbInstance.endpoint.apply(endpoint => endpoint.split(':')[1]);
