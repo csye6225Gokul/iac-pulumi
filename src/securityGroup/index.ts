@@ -44,7 +44,13 @@ export const appSecurityGroup = new aws.ec2.SecurityGroup("application-security-
             toPort: 9000,
             cidrBlocks: [cidrBlock]
         }
-    ]
+    ],
+    egress: [{
+        protocol: "-1",
+        fromPort: 0,
+        toPort: 0,
+        cidrBlocks: ["0.0.0.0/0"],
+    }]
 });
 
 // // Export the security group's ID
