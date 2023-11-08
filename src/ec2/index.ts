@@ -114,14 +114,14 @@ const ec2Instance = new aws.ec2.Instance("myInstance", {
     MYSQL_USER=${dbEndpoint.username}
     MYSQL_PASSWORD=${dbEndpoint.password}
     EOF
-    if [ -f /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-config.json ]; then
     echo "CloudWatch config file exists. Starting CloudWatch Agent..."
+
     # Start the CloudWatch Agent
-    /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-config.json -s
-    else
-    echo "CloudWatch config file does not exist. Exiting..."
-    exit 1
-    fi
+    sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+    sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
+
+    sudo chown csye6225:csye6225 -R /opt/webapp
+
     `,
     
     tags: {
