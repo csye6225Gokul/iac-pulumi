@@ -6,3 +6,4 @@ import "./routes";
 import "./securityGroup"
 import "./rdsdb"
 import "./ec2"
+import "./zoneid"
