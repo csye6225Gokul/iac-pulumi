@@ -235,7 +235,7 @@ const scaleDownPolicy = new aws.autoscaling.Policy("scaleDownPolicy", {
     adjustmentType: "ChangeInCapacity",
     policyType: "SimpleScaling",
     scalingAdjustment: -1, // Decrement by 1
-    cooldown: 300,
+    cooldown: 120,
 });
 
 // CloudWatch Alarm for Scale Up
