@@ -3,10 +3,23 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import { vpc } from "../vpc";
 import { publicSubnets } from "../subnets"; 
-import { appSecurityGroup } from "../securityGroup";
+import { appSecurityGroup, loadBalancerSecurityGroup } from "../securityGroup";
 import {dbEndpoint,dbHost,dbPort} from "../rdsdb"
 
 const config = new pulumi.Config();
+
+
+export const alb = new aws.lb.LoadBalancer("app-lb", {
+    internal: false,
+    loadBalancerType: "application",
+    securityGroups: [loadBalancerSecurityGroup.id],
+    subnets: publicSubnets.apply(subnets => subnets.map(subnet => subnet.id)),
+    enableDeletionProtection: false,
+});
+
+
+// Target Group and Listener can be added here
+
 
 let amiId: string;
 try {
@@ -66,68 +79,208 @@ const instanceProfile = new aws.iam.InstanceProfile("my-instance-profile", {
 });
 
 
-const userDataInputs = pulumi.all([dbHost, dbPort]);
+const userdata = pulumi.interpolate`#!/bin/bash
+# Configure environment variables for the web application
+cat << 'EOF' > /opt/webapp/.env
+MYSQL_HOST=${dbEndpoint.address}
+MYSQL_PORT=${dbEndpoint.port}
+MYSQL_DATABASE=${dbEndpoint.dbName}
+MYSQL_USER=${dbEndpoint.username}
+MYSQL_PASSWORD=${dbEndpoint.password}
+EOF
+echo "CloudWatch config file exists. Starting CloudWatch Agent..."
 
-const ec2UserData = userDataInputs.apply(([host, port]) => {
-    return`#!/bin/bash
-    sudo echo "MYSQL_USER='csye6225'" | sudo tee -a /home/admin/webapp/.env
-    sudo echo "MYSQL_PASSWORD='msdIndu99'" | sudo tee -a /home/admin/webapp/.env
-    sudo echo "MYSQL_HOST='${host}'" | sudo tee /home/admin/webapp/.env
-    sudo echo "MYSQL_PORT='${port}'" | sudo tee /home/admin/webapp/.env
-    sudo echo "MYSQL_DATABASE='csye6225'" | sudo tee -a /home/admin/webapp/.env
-    
-    # Give csye6225 user permissions to read files
-    chmod +r /home/admin/webapp/*
-    
-    # Enable and start the service
-    cd /etc/systemd/system
-    cloud-init status --wait
-    sudo systemctl enable csye6225.service
-    sudo systemctl start csye6225.service
-    echo "Script stop..."
-`});
+# Start the CloudWatch Agent
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
 
+sudo chown csye6225:csye6225 -R /opt/webapp
 
+`
 
-
-
-
-const ec2Instance = new aws.ec2.Instance("myInstance", {
-    ami: amiId,
+const launchTemplate = new aws.ec2.LaunchTemplate("myLaunchTemplate", {
+    name: "my-launch-template",
+    imageId:amiId,
+    description: "My Launch Template",
+    blockDeviceMappings: [{
+        deviceName: "/dev/xvda",
+        ebs: {
+            volumeSize: 25,
+            volumeType: "gp2",
+            deleteOnTermination: 'true',
+        },
+    }],
     instanceType: "t2.micro",
     keyName: keyPairName,
-    disableApiTermination: false, 
-    vpcSecurityGroupIds: [appSecurityGroup.id],
-    iamInstanceProfile: instanceProfile.name,
-    rootBlockDevice: {
-        volumeSize: 25,  // 25 GiB
-        volumeType: "gp2",  // General Purpose SSD (GP2)
-        deleteOnTermination: true,
+    networkInterfaces: [{
+        deviceIndex: 0,
+        associatePublicIpAddress:  'true',
+        securityGroups: [appSecurityGroup.id],
+        subnetId: publicSubnets[0].id,
+    }],
+    tagSpecifications: [{
+        resourceType: "instance",
+        tags: {
+            Name: "Csye6255-gokul",
+        },
+    }],
+    userData:  pulumi.interpolate`${userdata.apply((s) =>
+        Buffer.from(s).toString("base64")
+      )}`,
+    iamInstanceProfile: {
+        name: instanceProfile.name,
     },
-    subnetId: publicSubnets[0].id,
-    userData: pulumi.interpolate`#!/bin/bash
-    # Configure environment variables for the web application
-    cat << 'EOF' > /opt/webapp/.env
-    MYSQL_HOST=${dbEndpoint.address}
-    MYSQL_PORT=${dbEndpoint.port}
-    MYSQL_DATABASE=${dbEndpoint.dbName}
-    MYSQL_USER=${dbEndpoint.username}
-    MYSQL_PASSWORD=${dbEndpoint.password}
-    EOF
-    echo "CloudWatch config file exists. Starting CloudWatch Agent..."
+    disableApiTermination:false
+},{dependsOn: [keyPair,dbEndpoint]});
 
-    # Start the CloudWatch Agent
-    sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
-    sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
 
-    sudo chown csye6225:csye6225 -R /opt/webapp
 
-    `,
+
+
+// const ec2Instance = new aws.ec2.Instance("myInstance", {
+//     ami: amiId,
+//     instanceType: "t2.micro",
+//     keyName: keyPairName,
+//     disableApiTermination: false, 
+//     vpcSecurityGroupIds: [appSecurityGroup.id],
+//     iamInstanceProfile: instanceProfile.name,
+//     rootBlockDevice: {
+//         volumeSize: 25,  // 25 GiB
+//         volumeType: "gp2",  // General Purpose SSD (GP2)
+//         deleteOnTermination: true,
+//     },
+//     subnetId: publicSubnets[0].id,
+//     userData: pulumi.interpolate`#!/bin/bash
+//     # Configure environment variables for the web application
+//     cat << 'EOF' > /opt/webapp/.env
+//     MYSQL_HOST=${dbEndpoint.address}
+//     MYSQL_PORT=${dbEndpoint.port}
+//     MYSQL_DATABASE=${dbEndpoint.dbName}
+//     MYSQL_USER=${dbEndpoint.username}
+//     MYSQL_PASSWORD=${dbEndpoint.password}
+//     EOF
+//     echo "CloudWatch config file exists. Starting CloudWatch Agent..."
+
+//     # Start the CloudWatch Agent
+//     sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
+//     sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
+
+//     sudo chown csye6225:csye6225 -R /opt/webapp
+
+//     `,
     
-    tags: {
-        Name: "Csye6255-gokul",
-    },
-}, { dependsOn: [keyPair,dbEndpoint] }); // Ensure the key pair is created before the EC2 instance.
+//     tags: {
+//         Name: "Csye6255-gokul",
+//     },
+// }, { dependsOn: [keyPair,dbEndpoint] }); // Ensure the key pair is created before the EC2 instance.
 
-export const publicIp = ec2Instance.publicIp;
-export const publicDns = ec2Instance.publicDns;
+
+
+const targetGroup = new aws.alb.TargetGroup("targetGroup",{
+    port:9000,
+    protocol:'HTTP',
+    vpcId:vpc.id,
+    targetType:'instance',
+    healthCheck:{
+      enabled:true,
+      path:'/healthz',
+      protocol:'HTTP',
+      port:'9000',
+      timeout:25
+  
+    }
+  })
+
+  const listener = new aws.alb.Listener("listener",{
+    loadBalancerArn:alb.arn,
+    port:80,
+    defaultActions:[{
+      type:'forward',
+      targetGroupArn:targetGroup.arn
+    }]
+  })
+
+
+
+  // Create an Auto Scaling group
+const autoScalingGroup = new aws.autoscaling.Group("myAutoScalingGroup", {
+    launchTemplate: {
+        id: launchTemplate.id,
+        version: "$Latest", // Use the latest version of the launch template
+    },
+    minSize: 1,
+    maxSize: 3,
+    desiredCapacity: 1,
+    targetGroupArns:[targetGroup.arn],
+    vpcZoneIdentifiers: [publicSubnets[0].id,publicSubnets[1].id,publicSubnets[2].id], // Subnet IDs where instances will be launched // Get availability zones
+    tags: [{
+        key: "Name",
+        value: "Csye6255-gokul",
+        propagateAtLaunch: true,
+    }],
+    // Add your other properties like cooldown, health check, etc. here
+});
+
+// Define scaling policies
+const scaleUpPolicy = new aws.autoscaling.Policy("scaleUpPolicy", {
+    autoscalingGroupName: autoScalingGroup.name,
+    adjustmentType: "ChangeInCapacity",
+    policyType: "SimpleScaling",
+    scalingAdjustment: 1, // Increment by 1
+    cooldown: 60,
+});
+
+const scaleDownPolicy = new aws.autoscaling.Policy("scaleDownPolicy", {
+    autoscalingGroupName: autoScalingGroup.name,
+    adjustmentType: "ChangeInCapacity",
+    policyType: "SimpleScaling",
+    scalingAdjustment: -1, // Decrement by 1
+    cooldown: 300,
+});
+
+// CloudWatch Alarm for Scale Up
+const scaleUpAlarm = new aws.cloudwatch.MetricAlarm("scaleUpAlarm", {
+    comparisonOperator: "GreaterThanOrEqualToThreshold",
+    evaluationPeriods: 1,
+    metricName: "CPUUtilization",
+    namespace: "AWS/EC2",
+    period: 60,
+    statistic: "Average",
+    threshold: 5, // Adjust as needed
+    alarmActions: [scaleUpPolicy.arn],
+    dimensions: {
+        AutoScalingGroupName: autoScalingGroup.name,
+    },
+});
+
+// CloudWatch Alarm for Scale Down
+const scaleDownAlarm = new aws.cloudwatch.MetricAlarm("scaleDownAlarm", {
+    comparisonOperator: "LessThanOrEqualToThreshold",
+    evaluationPeriods: 1,
+    metricName: "CPUUtilization",
+    namespace: "AWS/EC2",
+    period: 60,
+    statistic: "Average",
+    threshold: 3, // Adjust as needed
+    alarmActions: [scaleDownPolicy.arn],
+    dimensions: {
+        AutoScalingGroupName: autoScalingGroup.name,
+    },
+});
+
+
+// // Attach scaling policies to the Auto Scaling group
+// new aws.autoscaling.GroupPolicyAttachment("scaleUpAttachment", {
+//     policyArn: scaleUpPolicy.arn,
+//     autoscalingGroupName: autoScalingGroup.name,
+// });
+
+// new aws.autoscaling.GroupPolicyAttachment("scaleDownAttachment", {
+//     policyArn: scaleDownPolicy.arn,
+//     autoscalingGroupName: autoScalingGroup.name,
+// });
+
+
+
+// export const publicIp = ec2Instance.publicIp;
+// export const publicDns = ec2Instance.publicDns;

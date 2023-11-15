@@ -1,7 +1,7 @@
 config:
   aws:region: us-east-1
   iac-pulumi:cidrBlock: "10.0.0.0/16"
-  iac-pulumi:amiId: ami-08af724b46301436c
+  iac-pulumi:amiId: ami-06064fe77a0ac9195
   iac-pulumi:igwcidrBlock: "0.0.0.0/0"
   iac-pulumi:zone-id: Z0758175ZQW91F4CQWRU
   iac-pulumi:zone-name: demo.gokul.cloud
