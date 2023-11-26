@@ -1,9 +1,11 @@
 import "./vpc";
 import "./subnets";
 import "./igw";
+import "./gcp";
 import "./route-tables";
 import "./routes";
-import "./securityGroup"
-import "./rdsdb"
-import "./ec2"
-import "./zoneid"
+import "./securityGroup";
+import "./rdsdb";
+import "./lambda";
+import "./ec2";
+import "./zoneid";

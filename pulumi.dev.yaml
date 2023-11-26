@@ -1,10 +1,12 @@
 config:
   aws:region: us-east-1
+  gcp:project: webapp-405322
   iac-pulumi:cidrBlock: "10.1.0.0/16"
-  iac-pulumi:amiId: ami-0fd5d354a87d52bb0
+  iac-pulumi:amiId: ami-0b6b3513a4bffb2f1
   iac-pulumi:igwcidrBlock: "0.0.0.0/0"
   iac-pulumi:zone-id: Z08640292AN0KAG1IZ30C
   iac-pulumi:zone-name: dev.gokul.cloud
+  iac-pulumi:projectid: webapp-405322
   # iac-pulumi:privateSubnetCidrBlocks:
   #   - "10.0.4.0/24"
   #   - "10.0.5.0/24"

@@ -5,6 +5,7 @@ import { vpc } from "../vpc";
 import { publicSubnets } from "../subnets"; 
 import { appSecurityGroup, loadBalancerSecurityGroup } from "../securityGroup";
 import {dbEndpoint,dbHost,dbPort} from "../rdsdb"
+import {snsTopicArn} from "../lambda"
 
 const config = new pulumi.Config();
 
@@ -87,6 +88,7 @@ MYSQL_PORT=${dbEndpoint.port}
 MYSQL_DATABASE=${dbEndpoint.dbName}
 MYSQL_USER=${dbEndpoint.username}
 MYSQL_PASSWORD=${dbEndpoint.password}
+SNS_TOPIC=${snsTopicArn}
 EOF
 echo "CloudWatch config file exists. Starting CloudWatch Agent..."
 
