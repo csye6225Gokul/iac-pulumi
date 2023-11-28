@@ -7,7 +7,9 @@ import {bucketName, serviceAccountKeyEncoded } from '../gcp/index'
 
 const snsTopic = new aws.sns.Topic("myTopic");
 
-
+const config = new pulumi.Config();
+const accountid = config.require("accountnumber");
+const email = config.require("email");
 
 const lambdaRole = new aws.iam.Role("lambdaRole", {
     assumeRolePolicy: JSON.stringify({
@@ -38,11 +40,6 @@ const awsRole = new aws.iam.Role("awsRoleForGCP", {
     })
 });
 
-
-// Use the assumed role's credentials to authenticate with GCP
-
-
-// IAM policy for Lambda to interact with DynamoDB and other necessary services
 
 const lambdaPolicy = new aws.iam.Policy("lambdaPolicy", {
     policy: JSON.stringify({
@@ -123,39 +120,10 @@ const table = new aws.dynamodb.Table("emailWebappTable", {
             projectionType: "ALL", 
         }
 ]
-     // Or "PROVISIONED" if you want to specify read/write capacity
-    // Uncomment the following lines if you choose "PROVISIONED" billing mode
-    // readCapacity: 1,
-    // writeCapacity: 1
+     
 });
 
-// const dynamodb = new aws.DynamoDB();
 
-// const params = {
-//     TableName: 'email-webapp',
-//     KeySchema: [
-//         { AttributeName: 'id', KeyType: 'HASH' }  // Partition key
-//     ],
-//     AttributeDefinitions: [
-//         { AttributeName: 'id', AttributeType: 'S' }
-//         // Include other attributes if they are used as indexes
-//     ],
-//     ProvisionedThroughput: {
-//         ReadCapacityUnits: 1,
-//         WriteCapacityUnits: 1
-//     }
-// };
-
-// const createTable = async () => {
-//     try {
-//         const data = await dynamodb.createTable(params).promise();
-//         console.log('Created table. Table description JSON:', JSON.stringify(data, null, 2));
-//     } catch (err) {
-//         console.error('Unable to create table. Error JSON:', JSON.stringify(err, null, 2));
-//     }
-// };
-
-// createTable();
 
 const lambdaZipPath = '/Users/gokuljayavel/Desktop/CloudProject/serverless';
 
@@ -169,10 +137,10 @@ const lambdaFunction = new aws.lambda.Function("myFunction", {
         variables: {
             GCP_SERVICE_ACCOUNT_KEY: serviceAccountKeyEncoded,
             BUCKET_NAME: bucketName,
-            AWS_ACCOUNT_ID: "544273504223",
+            AWS_ACCOUNT_ID: accountid,
             ROLE_NAME: awsRole.name,
             TABLE_NAME: table.name,
-            SES_SENDER_EMAIL: "gokul.jaya1999+demo@gmail.com"
+            SES_SENDER_EMAIL: email
             // Other environment variables like email server configuration
         },
     },

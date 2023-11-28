@@ -73,6 +73,12 @@ const policyAttachment = new aws.iam.RolePolicyAttachment("my-cloudwatch-policy-
     policyArn: "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy",
 });
 
+const snsEC2FullAccessPolicyAttachment = new aws.iam.RolePolicyAttachment("snsEC2FullAccessPolicyAttachment", {
+    role: role.name,
+    policyArn: "arn:aws:iam::aws:policy/AmazonSNSFullAccess",
+});
+
+
 
 // Create an Instance Profile to associate the role with EC2 instances
 const instanceProfile = new aws.iam.InstanceProfile("my-instance-profile", {
@@ -134,48 +140,6 @@ const launchTemplate = new aws.ec2.LaunchTemplate("myLaunchTemplate", {
     },
     disableApiTermination:false
 },{dependsOn: [keyPair,dbEndpoint]});
-
-
-
-
-
-// const ec2Instance = new aws.ec2.Instance("myInstance", {
-//     ami: amiId,
-//     instanceType: "t2.micro",
-//     keyName: keyPairName,
-//     disableApiTermination: false, 
-//     vpcSecurityGroupIds: [appSecurityGroup.id],
-//     iamInstanceProfile: instanceProfile.name,
-//     rootBlockDevice: {
-//         volumeSize: 25,  // 25 GiB
-//         volumeType: "gp2",  // General Purpose SSD (GP2)
-//         deleteOnTermination: true,
-//     },
-//     subnetId: publicSubnets[0].id,
-//     userData: pulumi.interpolate`#!/bin/bash
-//     # Configure environment variables for the web application
-//     cat << 'EOF' > /opt/webapp/.env
-//     MYSQL_HOST=${dbEndpoint.address}
-//     MYSQL_PORT=${dbEndpoint.port}
-//     MYSQL_DATABASE=${dbEndpoint.dbName}
-//     MYSQL_USER=${dbEndpoint.username}
-//     MYSQL_PASSWORD=${dbEndpoint.password}
-//     EOF
-//     echo "CloudWatch config file exists. Starting CloudWatch Agent..."
-
-//     # Start the CloudWatch Agent
-//     sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json -s
-//     sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
-
-//     sudo chown csye6225:csye6225 -R /opt/webapp
-
-//     `,
-    
-//     tags: {
-//         Name: "Csye6255-gokul",
-//     },
-// }, { dependsOn: [keyPair,dbEndpoint] }); // Ensure the key pair is created before the EC2 instance.
-
 
 
 const targetGroup = new aws.alb.TargetGroup("targetGroup",{
@@ -269,6 +233,17 @@ const scaleDownAlarm = new aws.cloudwatch.MetricAlarm("scaleDownAlarm", {
         AutoScalingGroupName: autoScalingGroup.name,
     },
 });
+
+// const autoScalingNotification = new aws.autoscaling.Notification("myAutoScalingNotification", {
+//     groupNames: [autoScalingGroup.name],
+//     notifications: [
+//         "autoscaling:EC2_INSTANCE_LAUNCH",
+//         "autoscaling:EC2_INSTANCE_LAUNCH_ERROR",
+//         "autoscaling:EC2_INSTANCE_TERMINATE",
+//         "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
+//     ],
+//     topicArn: snsTopicArn
+// });
 
 
 // // Attach scaling policies to the Auto Scaling group
