@@ -99,7 +99,8 @@ const table = new aws.dynamodb.Table("emailWebappTable", {
         { name: "id", type: "S" }, // Composite primary key (email+timestamp)
         { name: "email", type: "S" },
         { name: "timestamp", type: "S" },
-        { name: "status", type: "S" }
+        { name: "status", type: "S" },
+        { name: "download", type: "S" }
     ],
     hashKey: "id",
     billingMode: "PAY_PER_REQUEST",
@@ -118,6 +119,11 @@ const table = new aws.dynamodb.Table("emailWebappTable", {
             name: "statusIndex",
             hashKey: "status",
             projectionType: "ALL", 
+        },
+        {
+            name: "downloadIndex",
+            hashKey: "download",
+            projectionType: "ALL", 
         }
 ]
      
@@ -125,7 +131,7 @@ const table = new aws.dynamodb.Table("emailWebappTable", {
 
 
 
-const lambdaZipPath = '/Users/gokuljayavel/Desktop/CloudProject/serverless';
+const lambdaZipPath = config.require("path");
 
 // Create Lambda Function
 const lambdaFunction = new aws.lambda.Function("myFunction", {

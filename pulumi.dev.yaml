@@ -7,6 +7,9 @@ config:
   iac-pulumi:zone-id: Z08640292AN0KAG1IZ30C
   iac-pulumi:zone-name: dev.gokul.cloud
   iac-pulumi:projectid: webapp-405322
+  iac-pulumi:accountnumber: "544273504223"
+  iac-pulumi:email: "gokul.jaya1999+demo@demo.gokul.cloud"
+  ac-pulumi:path: "/Users/gokuljayavel/Desktop/CloudProject/serverless"
   # iac-pulumi:privateSubnetCidrBlocks:
   #   - "10.0.4.0/24"
   #   - "10.0.5.0/24"
