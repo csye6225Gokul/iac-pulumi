@@ -11,10 +11,10 @@ export const loadBalancerSecurityGroup = new aws.ec2.SecurityGroup("loadbalancer
     description: "Security group for Load Balancer",
     vpcId: vpc.id,
     ingress: [
-        { protocol: "tcp", fromPort: 80, toPort: 80, cidrBlocks: ["0.0.0.0/0"] },
-        { protocol: "tcp", fromPort: 443, toPort: 443, cidrBlocks: ["0.0.0.0/0"] },
+        { protocol: "tcp", fromPort: 80, toPort: 80, cidrBlocks: [cidrBlock] },
+        { protocol: "tcp", fromPort: 443, toPort: 443, cidrBlocks: [cidrBlock] },
     ],
-    egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: ["0.0.0.0/0"] }],
+    egress: [{ protocol: "-1", fromPort: 0, toPort: 0, cidrBlocks: [cidrBlock] }],
     tags: { Name: "Csye6255-loadbalancer-security-group" },
 });
 
@@ -45,7 +45,7 @@ export const appSecurityGroup = new aws.ec2.SecurityGroup("application-security-
         protocol: "-1",
         fromPort: 0,
         toPort: 0,
-        cidrBlocks: ["0.0.0.0/0"],
+        cidrBlocks: [cidrBlock],
     }]
 },{dependsOn: loadBalancerSecurityGroup });
 

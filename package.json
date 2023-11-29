@@ -6,10 +6,11 @@
         "typescript": "^2.9.2"
     },
     "dependencies": {
+        "@google-cloud/storage": "^7.6.0",
         "@pulumi/aws": "^6.5.0",
+        "@pulumi/gcp": "^7.2.1",
         "@pulumi/pulumi": "^3.88.1",
         "fs": "^0.0.1-security",
-
         "ip": "^1.1.8",
         "p": "^0.2.0"
     }
