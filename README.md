@@ -31,3 +31,7 @@ To run pulumi
 2. update your latest amiid in your stack yaml file
 3. pulumi up command, to run pulumi. After this command, will be prompted to enter the secrect passphrase for pulumi
 4. To destroy created resources or update, give pulumi destroy/ pulumi up
+
+# Comment to import certificate
+
+aws acm import-certificate --certificate fileb:///Users/gokuljayavel/Downloads/demo_gokul.cloud/demo_gokul_cloud.crt --private-key fileb:///Users/gokuljayavel/Downloads/demo_gokul.cloud/privatekey.pem --certificate-chain fileb:///Users/gokuljayavel/Downloads/demo_gokul.cloud/demo_gokul_cloud.ca-bundle

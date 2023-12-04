@@ -1,14 +1,16 @@
 config:
   aws:region: us-east-1
   gcp:project: webapp-405322
-  iac-pulumi:amiId: ami-02a29370e576bb5d6
+  iac-pulumi:amiId: ami-061758fcde280be81
   iac-pulumi:cidrBlock: "10.0.0.0/16"
   iac-pulumi:igwcidrBlock: "0.0.0.0/0"
   iac-pulumi:projectid: webapp-405322
   iac-pulumi:accountnumber: "544273504223"
   iac-pulumi:email: "gokul.jaya1999+demo@demo.gokul.cloud"
   iac-pulumi:path: "/Users/gokuljayavel/Desktop/CloudProject/serverless"
+  iac-pulumi:CertificateArn: "arn:aws:acm:us-east-1:544273504223:certificate/718a0955-187c-44f3-9443-70849f45499f"
   # iac-pulumi:privateSubnetCidrBlocks:
+
   #   - "10.0.4.0/24"
   #   - "10.0.5.0/24"
   #   - "10.0.6.0/24"
