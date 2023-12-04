@@ -27,13 +27,13 @@ export const appSecurityGroup = new aws.ec2.SecurityGroup("application-security-
     vpcId: vpc.id,
     ingress: [
         // SSH access
-        {
-            protocol: "tcp",
-            fromPort: 22,
-            toPort: 22,
-            cidrBlocks: [cidrBlock]
+        // {
+        //     protocol: "tcp",
+        //     fromPort: 22,
+        //     toPort: 22,
+        //     cidrBlocks: [cidrBlock]
 
-        },
+        // },
         {
             protocol: "tcp",
             fromPort: 9000,

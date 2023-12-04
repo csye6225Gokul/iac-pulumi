@@ -23,12 +23,15 @@ export const alb = new aws.lb.LoadBalancer("app-lb", {
 
 
 let amiId: string;
+let certificatearn: string;
 try {
     amiId = config.require("amiId");
 } catch (error) {
     pulumi.log.error("AMI ID not set in Pulumi config.");
     throw error;
 }
+
+certificatearn = config.require("CertificateArn");
 
 let rawKeyContent: string;
 try {
@@ -159,7 +162,9 @@ const targetGroup = new aws.alb.TargetGroup("targetGroup",{
 
   const listener = new aws.alb.Listener("listener",{
     loadBalancerArn:alb.arn,
-    port:80,
+    certificateArn: certificatearn,
+    port:443,
+    protocol: "HTTPS",
     defaultActions:[{
       type:'forward',
       targetGroupArn:targetGroup.arn

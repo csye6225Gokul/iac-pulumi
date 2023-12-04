@@ -2,14 +2,16 @@ config:
   aws:region: us-east-1
   gcp:project: webapp-405322
   iac-pulumi:cidrBlock: "10.1.0.0/16"
-  iac-pulumi:amiId: ami-0b6b3513a4bffb2f1
+  iac-pulumi:amiId: ami-061758fcde280be81
   iac-pulumi:igwcidrBlock: "0.0.0.0/0"
   iac-pulumi:zone-id: Z08640292AN0KAG1IZ30C
   iac-pulumi:zone-name: dev.gokul.cloud
   iac-pulumi:projectid: webapp-405322
-  iac-pulumi:accountnumber: "544273504223"
+  iac-pulumi:accountnumber: "877555005716"
   iac-pulumi:email: "gokul.jaya1999+demo@demo.gokul.cloud"
-  ac-pulumi:path: "/Users/gokuljayavel/Desktop/CloudProject/serverless"
+  iac-pulumi:path: "/Users/gokuljayavel/Desktop/CloudProject/serverless"
+  iac-pulumi:CertificateArn: "arn:aws:acm:us-east-1:877555005716:certificate/77b8b67f-c3ed-4c97-a7c7-ecbca07742a2"
+  
   # iac-pulumi:privateSubnetCidrBlocks:
   #   - "10.0.4.0/24"
   #   - "10.0.5.0/24"
